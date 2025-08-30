@@ -108,7 +108,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Minimal loading indicator */
+        /* Loading spinner */
         .loading {
             position: fixed;
             top: 20px;
@@ -131,6 +131,31 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Buttons */
+        .controls {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            background: rgba(20, 20, 20, 0.7);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn:hover {
+            background: rgba(40, 40, 40, 0.9);
+        }
     </style>
 </head>
 <body>
@@ -142,45 +167,28 @@
         </div>
 
         <div class="bookmarks">
-            <a href="https://www.google.com" class="bookmark">
-                <span class="bookmark-icon">🔍</span>
-                Google
-            </a>
-            <a href="https://www.youtube.com" class="bookmark">
-                <span class="bookmark-icon">📺</span>
-                YouTube
-            </a>
-            <a href="https://www.github.com" class="bookmark">
-                <span class="bookmark-icon">💻</span>
-                GitHub
-            </a>
-            <a href="https://www.reddit.com" class="bookmark">
-                <span class="bookmark-icon">💬</span>
-                Reddit
-            </a>
-            <a href="https://mail.google.com" class="bookmark">
-                <span class="bookmark-icon">📧</span>
-                Gmail
-            </a>
-            <a href="https://www.twitter.com" class="bookmark">
-                <span class="bookmark-icon">🐦</span>
-                Twitter
-            </a>
-            <a href="https://www.amazon.com" class="bookmark">
-                <span class="bookmark-icon">🛒</span>
-                Amazon
-            </a>
-            <a href="https://www.netflix.com" class="bookmark">
-                <span class="bookmark-icon">🎬</span>
-                Netflix
-            </a>
+            <a href="https://www.google.com" class="bookmark"><span class="bookmark-icon">🔍</span>Google</a>
+            <a href="https://www.youtube.com" class="bookmark"><span class="bookmark-icon">📺</span>YouTube</a>
+            <a href="https://www.github.com" class="bookmark"><span class="bookmark-icon">💻</span>GitHub</a>
+            <a href="https://www.reddit.com" class="bookmark"><span class="bookmark-icon">💬</span>Reddit</a>
+            <a href="https://mail.google.com" class="bookmark"><span class="bookmark-icon">📧</span>Gmail</a>
+            <a href="https://www.twitter.com" class="bookmark"><span class="bookmark-icon">🐦</span>Twitter</a>
+            <a href="https://www.amazon.com" class="bookmark"><span class="bookmark-icon">🛒</span>Amazon</a>
+            <a href="https://www.netflix.com" class="bookmark"><span class="bookmark-icon">🎬</span>Netflix</a>
         </div>
+    </div>
+
+    <div class="controls">
+        <button class="btn" id="toggleMode">Mode: SFW</button>
+        <button class="btn" id="refreshBtn">Refresh</button>
     </div>
 
     <div class="wallpaper-credit" id="wallpaperCredit"></div>
 
     <script>
-        // Search functionality
+        let mode = "sfw"; // default mode
+
+        // Search
         document.getElementById('searchBar').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 const query = this.value.trim();
@@ -190,65 +198,48 @@
             }
         });
 
-        // Random anime wallpaper fetcher
+        // Wallpaper loader
         async function setRandomWallpaper() {
             const loading = document.getElementById('loading');
             loading.classList.add('show');
 
-            const wallpaperSources = [
-                {
-                    name: 'waifu.pics',
-                    url: 'https://api.waifu.pics/sfw/waifu',
-                    parseResponse: (data) => data.url
-                },
-                {
-                    name: 'waifu.pics landscape',
-                    url: 'https://api.waifu.pics/sfw/neko',
-                    parseResponse: (data) => data.url
-                }
-            ];
+            const url = `https://api.waifu.pics/${mode}/waifu`;
 
-            // Try each source until one works
-            for (const source of wallpaperSources) {
-                try {
-                    const response = await fetch(source.url);
-                    if (!response.ok) continue;
-                    
-                    const data = await response.json();
-                    const imageUrl = source.parseResponse(data);
-                    
-                    if (imageUrl) {
-                        // Preload image to ensure it loads properly
-                        const img = new Image();
-                        img.onload = () => {
-                            document.body.style.backgroundImage = `url(${imageUrl})`;
-                            document.getElementById('wallpaperCredit').textContent = source.name;
-                            loading.classList.remove('show');
-                        };
-                        img.onerror = () => {
-                            loading.classList.remove('show');
-                        };
-                        img.src = imageUrl;
-                        return; // Success, exit the loop
-                    }
-                } catch (error) {
-                    console.log(`Failed to load from ${source.name}:`, error);
-                    continue; // Try next source
-                }
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                const imageUrl = data.url;
+
+                const img = new Image();
+                img.onload = () => {
+                    document.body.style.backgroundImage = `url(${imageUrl})`;
+                    document.getElementById('wallpaperCredit').textContent = `Source: waifu.pics (${mode.toUpperCase()})`;
+                    loading.classList.remove('show');
+                };
+                img.onerror = () => {
+                    loading.classList.remove('show');
+                };
+                img.src = imageUrl;
+            } catch (error) {
+                console.error("Wallpaper load failed", error);
+                loading.classList.remove('show');
             }
-            
-            // If all sources fail, keep the dark background
-            loading.classList.remove('show');
-            console.log('All wallpaper sources failed, using default background');
         }
 
-        // Load wallpaper when page loads
-        window.addEventListener('load', () => {
-            setTimeout(setRandomWallpaper, 500); // Small delay for better UX
-        });
+        // Toggle mode
+        document.getElementById("toggleMode").onclick = () => {
+            mode = (mode === "sfw") ? "nsfw" : "sfw";
+            document.getElementById("toggleMode").textContent = `Mode: ${mode.toUpperCase()}`;
+            setRandomWallpaper();
+        };
 
-        // Optional: Click anywhere to refresh wallpaper
-        document.addEventListener('dblclick', setRandomWallpaper);
+        // Refresh button
+        document.getElementById("refreshBtn").onclick = setRandomWallpaper;
+
+        // Load on start
+        window.addEventListener('load', () => {
+            setTimeout(setRandomWallpaper, 500);
+        });
     </script>
 </body>
 </html>
