@@ -1,245 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cromite Homepage</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cromite Homepage</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            width: 100vw;
-            height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            overflow-x: hidden;
-            color: white;
-        }
+    body {
+      width: 100vw;
+      height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      overflow: hidden;
+      color: white;
+    }
 
-        .container {
-            padding: 60px 40px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+    .container {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
-        .search-container {
-            margin-bottom: 60px;
-            width: 100%;
-            max-width: 500px;
-        }
+    /* Search bar */
+    .search-bar {
+      width: 70%;
+      max-width: 600px;
+      padding: 14px 18px;
+      border: none;
+      border-radius: 40px;
+      font-size: 18px;
+      color: white;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(10px);
+      outline: none;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.2);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+      transition: all 0.3s ease;
+    }
 
-        .search-bar {
-            width: 100%;
-            background: rgba(20, 20, 20, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 16px 20px;
-            color: white;
-            font-size: 16px;
-            outline: none;
-            backdrop-filter: blur(20px);
-            transition: all 0.3s ease;
-        }
+    .search-bar::placeholder {
+      color: rgba(255, 255, 255, 0.7);
+    }
 
-        .search-bar::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
+    .search-bar:focus {
+      background: rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
 
-        .search-bar:focus {
-            background: rgba(30, 30, 30, 0.9);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
-        }
+    /* Floating controls */
+    .controls {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
-        .bookmarks {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            justify-content: center;
-            max-width: 600px;
-        }
+    .btn {
+      padding: 10px 16px;
+      border-radius: 30px;
+      border: none;
+      background: rgba(0,0,0,0.35);
+      backdrop-filter: blur(10px);
+      color: white;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
 
-        .bookmark {
-            background: rgba(20, 20, 20, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 8px;
-            padding: 12px 20px;
-            text-decoration: none;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+    }
 
-        .bookmark:hover {
-            background: rgba(40, 40, 40, 0.8);
-            color: white;
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
+    /* Spinner */
+    .loading {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top: 2px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .loading.show { opacity: 1; }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        .bookmark-icon {
-            font-size: 16px;
-            opacity: 0.8;
-        }
-
-        .wallpaper-credit {
-            position: fixed;
-            bottom: 16px;
-            right: 16px;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 11px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 6px;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Loading spinner */
-        .loading {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            width: 20px;
-            height: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-top: 2px solid rgba(255, 255, 255, 0.8);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .loading.show {
-            opacity: 1;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Buttons */
-        .controls {
-            position: fixed;
-            bottom: 16px;
-            left: 16px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .btn {
-            background: rgba(20, 20, 20, 0.7);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .btn:hover {
-            background: rgba(40, 40, 40, 0.9);
-        }
-    </style>
+    /* Wallpaper credit */
+    .wallpaper-credit {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 6px 12px;
+      border-radius: 8px;
+      backdrop-filter: blur(6px);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+  </style>
 </head>
 <body>
-    <div class="loading" id="loading"></div>
-    
-    <div class="container">
-        <div class="search-container">
-            <input type="text" class="search-bar" placeholder="Search..." id="searchBar">
-        </div>
+  <div class="loading" id="loading"></div>
 
-        <div class="bookmarks">
-            <a href="https://www.google.com" class="bookmark"><span class="bookmark-icon">🔍</span>Google</a>
-            <a href="https://www.youtube.com" class="bookmark"><span class="bookmark-icon">📺</span>YouTube</a>
-            <a href="https://www.github.com" class="bookmark"><span class="bookmark-icon">💻</span>GitHub</a>
-            <a href="https://www.reddit.com" class="bookmark"><span class="bookmark-icon">💬</span>Reddit</a>
-            <a href="https://mail.google.com" class="bookmark"><span class="bookmark-icon">📧</span>Gmail</a>
-            <a href="https://www.twitter.com" class="bookmark"><span class="bookmark-icon">🐦</span>Twitter</a>
-            <a href="https://www.amazon.com" class="bookmark"><span class="bookmark-icon">🛒</span>Amazon</a>
-            <a href="https://www.netflix.com" class="bookmark"><span class="bookmark-icon">🎬</span>Netflix</a>
-        </div>
-    </div>
+  <div class="container">
+    <input type="text" class="search-bar" placeholder="Search the web..." id="searchBar">
+  </div>
 
-    <div class="controls">
-        <button class="btn" id="toggleMode">Mode: SFW</button>
-        <button class="btn" id="refreshBtn">Refresh</button>
-    </div>
+  <div class="controls">
+    <button class="btn" id="toggleMode">Mode: SFW</button>
+    <button class="btn" id="refreshBtn">Refresh</button>
+  </div>
 
-    <div class="wallpaper-credit" id="wallpaperCredit"></div>
+  <div class="wallpaper-credit" id="wallpaperCredit"></div>
 
-    <script>
-        let mode = "sfw"; // default mode
+  <script>
+    let mode = "sfw"; // default mode
 
-        // Search
-        document.getElementById('searchBar').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const query = this.value.trim();
-                if (query) {
-                    window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-                }
-            }
-        });
-
-        // Wallpaper loader
-        async function setRandomWallpaper() {
-            const loading = document.getElementById('loading');
-            loading.classList.add('show');
-
-            const url = `https://api.waifu.pics/${mode}/waifu`;
-
-            try {
-                const response = await fetch(url);
-                const data = await response.json();
-                const imageUrl = data.url;
-
-                const img = new Image();
-                img.onload = () => {
-                    document.body.style.backgroundImage = `url(${imageUrl})`;
-                    document.getElementById('wallpaperCredit').textContent = `Source: waifu.pics (${mode.toUpperCase()})`;
-                    loading.classList.remove('show');
-                };
-                img.onerror = () => {
-                    loading.classList.remove('show');
-                };
-                img.src = imageUrl;
-            } catch (error) {
-                console.error("Wallpaper load failed", error);
-                loading.classList.remove('show');
-            }
+    // Search
+    document.getElementById('searchBar').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const query = this.value.trim();
+        if (query) {
+          window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
         }
+      }
+    });
 
-        // Toggle mode
-        document.getElementById("toggleMode").onclick = () => {
-            mode = (mode === "sfw") ? "nsfw" : "sfw";
-            document.getElementById("toggleMode").textContent = `Mode: ${mode.toUpperCase()}`;
-            setRandomWallpaper();
+    // Wallpaper loader
+    async function setRandomWallpaper() {
+      const loading = document.getElementById('loading');
+      loading.classList.add('show');
+
+      const url = `https://api.waifu.pics/${mode}/waifu`;
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const imageUrl = data.url;
+
+        const img = new Image();
+        img.onload = () => {
+          document.body.style.backgroundImage = `url(${imageUrl})`;
+          document.getElementById('wallpaperCredit').textContent = `waifu.pics (${mode.toUpperCase()})`;
+          loading.classList.remove('show');
         };
+        img.onerror = () => { loading.classList.remove('show'); };
+        img.src = imageUrl;
+      } catch (error) {
+        console.error("Wallpaper load failed", error);
+        loading.classList.remove('show');
+      }
+    }
 
-        // Refresh button
-        document.getElementById("refreshBtn").onclick = setRandomWallpaper;
+    // Toggle mode
+    document.getElementById("toggleMode").onclick = () => {
+      mode = (mode === "sfw") ? "nsfw" : "sfw";
+      document.getElementById("toggleMode").textContent = `Mode: ${mode.toUpperCase()}`;
+      setRandomWallpaper();
+    };
 
-        // Load on start
-        window.addEventListener('load', () => {
-            setTimeout(setRandomWallpaper, 500);
-        });
-    </script>
+    // Refresh button
+    document.getElementById("refreshBtn").onclick = setRandomWallpaper;
+
+    // Load on start
+    window.addEventListener('load', () => {
+      setTimeout(setRandomWallpaper, 400);
+    });
+  </script>
 </body>
 </html>
